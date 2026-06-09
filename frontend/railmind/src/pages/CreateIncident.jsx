@@ -1,0 +1,94 @@
+import { useNavigate } from "react-router-dom";
+
+export default function CreateIncident() {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white">
+
+      <div className="border-b border-slate-800">
+        <div className="max-w-5xl mx-auto px-6 py-5">
+
+          <h1 className="text-3xl font-bold text-cyan-400">
+            Create Incident
+          </h1>
+
+          <p className="text-slate-400 mt-2">
+            Report and analyze railway incidents using AI.
+          </p>
+
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 py-10">
+
+        <div className="bg-slate-900 border border-slate-700 rounded-2xl p-8">
+
+          <div className="space-y-6">
+
+            <div>
+              <label className="block mb-2 text-slate-300">
+                Incident Type
+              </label>
+
+              <select className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3">
+                <option>Track Crack</option>
+                <option>Signal Failure</option>
+                <option>Train Breakdown</option>
+                <option>Fire</option>
+                <option>Crowd Surge</option>
+                <option>Weather Hazard</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block mb-2 text-slate-300">
+                Location
+              </label>
+
+              <input
+                type="text"
+                placeholder="Kota Junction"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-slate-300">
+                Description
+              </label>
+
+              <textarea
+                rows="6"
+                placeholder="Describe the incident..."
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3"
+              />
+            </div>
+
+            <div>
+              <label className="block mb-2 text-slate-300">
+                Upload Image (Optional)
+              </label>
+
+              <input
+                type="file"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl p-3"
+              />
+            </div>
+
+            <button
+              onClick={() => navigate("/analysis")}
+              className="bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-semibold"
+            >
+              Analyze Incident
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
