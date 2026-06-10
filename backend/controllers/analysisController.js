@@ -1,32 +1,50 @@
-import { analyzeRailwayIncident } from "../services/geminiService.js";
+import { generateAIResponse } from "../services/aiService.js";
 
 export const analyzeIncident = async (req, res) => {
   try {
-    const {
-      incidentType,
-      location,
-      description,
-    } = req.body;
+    const { incidentType, location, description } = req.body;
 
-    const result = await analyzeRailwayIncident(
-      incidentType,
-      location,
-      description
-    );
+    const prompt = `
+You are a railway safety expert.
 
-    const cleanResponse = result
+Analyze the following railway incident.
+
+Incident Type:
+${incidentType}
+
+Location:
+${location}
+
+Description:
+${description}
+
+Return ONLY valid JSON.
+
+{
+  "severity":"",
+  "confidence":"",
+  "risk":"",
+  "affectedTrains":"",
+  "affectedPassengers":"",
+  "recommendedAction":""
+}
+`;
+
+    const result = await generateAIResponse(prompt);
+
+    const cleanResult = result
       .replace(/```json/g, "")
       .replace(/```/g, "")
       .trim();
 
-    const data = JSON.parse(cleanResponse);
+    const data = JSON.parse(cleanResult);
 
-    return res.status(200).json(data);
+    res.status(200).json(data);
 
   } catch (error) {
     console.error(error);
 
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: error.message,
     });

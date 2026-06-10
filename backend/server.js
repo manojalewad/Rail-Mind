@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import analysisRoutes from "./routes/analysisRoutes.js";
+import agentRoutes from "./routes/agentRoutes.js";
+import digitalTwinRoutes from "./routes/digitalTwinRoutes.js";
 dotenv.config();
 console.log(process.env.GEMINI_API_KEY);
 const app = express();
@@ -14,6 +16,8 @@ app.use(
   })
 );
 app.use("/api", analysisRoutes);
+app.use("/api", agentRoutes);
+app.use("/api", digitalTwinRoutes);
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,

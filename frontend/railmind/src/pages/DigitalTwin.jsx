@@ -1,150 +1,160 @@
 import ReactFlow, {
-    Background,
-    Controls,
+  Background,
+  Controls,
 } from "reactflow";
 
 import "reactflow/dist/style.css";
 
+import { useIncident } from "../context/IncidentContext";
+
 export default function DigitalTwin() {
-    const nodes = [
-        {
-            id: "1",
-            position: { x: 0, y: 100 },
-            data: { label: "Delhi" },
-            style: {
-                background: "#1e293b",
-                color: "white",
-                border: "2px solid #06b6d4",
-            },
-        },
+  const {
+    incidentData,
+    analysisData,
+    digitalTwinData,
+  } = useIncident();
 
-        {
-            id: "2",
-            position: { x: 250, y: 100 },
-            data: { label: "Jaipur" },
-            style: {
-                background: "#1e293b",
-                color: "white",
-                border: "2px solid #06b6d4",
-            },
-        },
-
-        {
-            id: "3",
-            position: { x: 500, y: 100 },
-            data: { label: "Kota Junction" },
-            style: {
-                background: "#7f1d1d",
-                color: "white",
-                border: "2px solid red",
-            },
-        },
-
-        {
-            id: "4",
-            position: { x: 750, y: 100 },
-            data: { label: "Mumbai" },
-            style: {
-                background: "#1e293b",
-                color: "white",
-                border: "2px solid #06b6d4",
-            },
-        },
-    ];
-
-    const edges = [
-        {
-            id: "e1-2",
-            source: "1",
-            target: "2",
-            animated: true,
-        },
-        {
-            id: "e2-3",
-            source: "2",
-            target: "3",
-            animated: true,
-            style: {
-                stroke: "red",
-                strokeWidth: 3,
-            },
-        },
-        {
-            id: "e3-4",
-            source: "3",
-            target: "4",
-            animated: true,
-        },
-    ];
-
+  if (!digitalTwinData) {
     return (
-        <div className="min-h-screen bg-slate-950 text-white">
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <h1 className="text-3xl">
+          No Digital Twin Data Found
+        </h1>
+      </div>
+    );
+  }
 
-            <div className="border-b border-slate-800">
-                <div className="max-w-7xl mx-auto px-6 py-5">
+  const getNodeStyle = (status) => {
+    if (status === "critical") {
+      return {
+        background: "#7f1d1d",
+        color: "white",
+        border: "2px solid red",
+        boxShadow: "0 0 20px rgba(255,0,0,0.7)",
+      };
+    }
 
-                    <h1 className="text-3xl font-bold text-cyan-400">
-                        Railway Digital Twin
-                    </h1>
+    if (status === "warning") {
+      return {
+        background: "#78350f",
+        color: "white",
+        border: "2px solid orange",
+      };
+    }
 
-                    <p className="text-slate-400 mt-2">
-                        Live operational visualization of affected routes.
-                    </p>
+    return {
+      background: "#14532d",
+      color: "white",
+      border: "2px solid #22c55e",
+    };
+  };
 
-                </div>
-            </div>
+  const nodes =
+    digitalTwinData.routeStations.map(
+      (station, index) => ({
+        id: String(index + 1),
 
-            <div
-                className="h-[80vh]"
-            >
-                <ReactFlow
-                    nodes={nodes}
-                    edges={edges}
-                    fitView
-                >
-                    <Background />
-                    <Controls />
-                </ReactFlow>
-            </div>
-            <div className="max-w-7xl mx-auto px-6 pb-10">
+        position: {
+          x: index * 250,
+          y: 100,
+        },
 
-                <div className="grid md:grid-cols-2 gap-6">
+        data: {
+          label: station.name,
+        },
 
-                    <div className="bg-slate-900 border border-red-700 rounded-2xl p-6">
+        style: getNodeStyle(
+          station.status
+        ),
+      })
+    );
 
-                        <h2 className="text-2xl font-bold text-red-400 mb-4">
-                            No Action Taken
-                        </h2>
+  const edges =
+    digitalTwinData.routeStations
+      .slice(0, -1)
+      .map((_, index) => ({
+        id: `e${index + 1}-${index + 2}`,
+        source: String(index + 1),
+        target: String(index + 2),
+        animated: true,
+      }));
 
-                        <ul className="space-y-3 text-slate-300">
-                            <li>🚨 18 trains affected</li>
-                            <li>🚨 4200 passengers impacted</li>
-                            <li>🚨 Delay increases to 90 minutes</li>
-                            <li>🚨 Derailment risk remains HIGH</li>
-                        </ul>
+  return (
+    <div className="min-h-screen bg-slate-950 text-white">
 
-                    </div>
+      <div className="border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 py-5">
 
-                    <div className="bg-slate-900 border border-green-700 rounded-2xl p-6">
+          <h1 className="text-3xl font-bold text-cyan-400">
+            AI Generated Digital Twin
+          </h1>
 
-                        <h2 className="text-2xl font-bold text-green-400 mb-4">
-                            AI Plan Executed
-                        </h2>
+          <p className="text-slate-400 mt-2">
+            Dynamic railway route generated by AI.
+          </p>
 
-                        <ul className="space-y-3 text-slate-300">
-                            <li>✅ 6 trains rerouted</li>
-                            <li>✅ Passenger alerts sent</li>
-                            <li>✅ Delay reduced to 18 minutes</li>
-                            <li>✅ Risk reduced to LOW</li>
-                        </ul>
+        </div>
+      </div>
 
-                    </div>
+      <div className="max-w-7xl mx-auto px-6 pt-6">
 
-                </div>
+        <div className="grid md:grid-cols-4 gap-6">
 
-            </div>
+          <div className="bg-slate-900 p-5 rounded-2xl">
+            <p className="text-slate-400">
+              Affected Station
+            </p>
+
+            <h2 className="text-xl font-bold text-red-400">
+              {digitalTwinData.affectedStation}
+            </h2>
+          </div>
+
+          <div className="bg-slate-900 p-5 rounded-2xl">
+            <p className="text-slate-400">
+              Impact Radius
+            </p>
+
+            <h2 className="text-xl font-bold">
+              {digitalTwinData.impactRadius}
+            </h2>
+          </div>
+
+          <div className="bg-slate-900 p-5 rounded-2xl">
+            <p className="text-slate-400">
+              Routes Impacted
+            </p>
+
+            <h2 className="text-xl font-bold">
+              {digitalTwinData.estimatedAffectedRoutes}
+            </h2>
+          </div>
+
+          <div className="bg-slate-900 p-5 rounded-2xl">
+            <p className="text-slate-400">
+              Severity
+            </p>
+
+            <h2 className="text-xl font-bold text-red-400">
+              {analysisData?.severity}
+            </h2>
+          </div>
 
         </div>
 
-    );
+      </div>
+
+      <div className="h-[60vh] mt-8">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          fitView
+        >
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </div>
+
+    </div>
+  );
 }

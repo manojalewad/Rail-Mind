@@ -1,28 +1,37 @@
 import { useNavigate } from "react-router-dom";
+import { useIncident } from "../context/IncidentContext";
 
 export default function Agents() {
   const navigate = useNavigate();
 
+  const { agentData,loading, setLoading } = useIncident();
+
+  if (!agentData) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <h1 className="text-3xl">
+          No agent data found.
+        </h1>
+      </div>
+    );
+  }
+
   const agents = [
     {
       title: "Safety Agent",
-      response:
-        "Track integrity compromised. Immediate halt recommended for incoming trains.",
+      response: agentData.safetyAgent,
     },
     {
       title: "Traffic Agent",
-      response:
-        "Reroute 6 trains through alternate corridor. Estimated delay: 18 minutes.",
+      response: agentData.trafficAgent,
     },
     {
       title: "Passenger Agent",
-      response:
-        "Notify affected passengers and issue revised arrival estimates.",
+      response: agentData.passengerAgent,
     },
     {
       title: "Maintenance Agent",
-      response:
-        "Dispatch Track Repair Unit A. Estimated repair time: 42 minutes.",
+      response: agentData.maintenanceAgent,
     },
   ];
 
@@ -71,18 +80,18 @@ export default function Agents() {
           </h2>
 
           <p className="text-slate-300">
-            Stop incoming trains, reroute alternate traffic, dispatch
-            maintenance crew, and notify affected passengers immediately.
+            {agentData.masterDecision}
           </p>
 
         </div>
 
         <button
-          onClick={() => navigate("/digital-twin")}
-          className="mt-8 bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-semibold"
-        >
-          View Digital Twin
-        </button>
+  disabled={loading}
+  onClick={() => navigate("/digital-twin")}
+  className="mt-8 bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-semibold disabled:opacity-50"
+>
+  View Digital Twin
+</button>
 
       </div>
 

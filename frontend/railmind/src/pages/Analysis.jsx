@@ -1,7 +1,54 @@
 import { useNavigate } from "react-router-dom";
-
+import { useIncident } from "../context/IncidentContext";
+import axios from "axios";
+import { generateAgents } from "../services/incidentService";
+import { generateDigitalTwin } from "../services/incidentService";
 export default function Analysis() {
   const navigate = useNavigate();
+  const {
+    incidentData,
+    analysisData,
+    setAgentData,
+    setDigitalTwinData,
+    loading,
+    setLoading,
+  } = useIncident();
+
+  if (!analysisData) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+        <h1 className="text-3xl">
+          No analysis data found.
+        </h1>
+      </div>
+    );
+  }
+const handleGenerateAgents = async () => {
+  try {
+    setLoading(true);
+
+    const response = await generateAgents({
+      incidentData,
+      analysisData,
+    });
+
+    setAgentData(response);
+
+    const twinResponse = await generateDigitalTwin({
+      incidentData,
+      analysisData,
+    });
+
+    setDigitalTwinData(twinResponse);
+
+    navigate("/agents");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to generate AI response");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -30,7 +77,7 @@ export default function Analysis() {
             </h2>
 
             <div className="text-red-400 text-4xl font-bold">
-              HIGH
+              {analysisData.severity}
             </div>
           </div>
 
@@ -40,7 +87,7 @@ export default function Analysis() {
             </h2>
 
             <div className="text-cyan-400 text-4xl font-bold">
-              92%
+              {analysisData.confidence}
             </div>
           </div>
 
@@ -53,8 +100,7 @@ export default function Analysis() {
           </h2>
 
           <p className="text-slate-300">
-            Potential derailment risk detected due to track damage.
-            Immediate intervention is recommended.
+            {analysisData.risk}
           </p>
 
         </div>
@@ -66,19 +112,42 @@ export default function Analysis() {
           </h2>
 
           <ul className="space-y-3 text-slate-300">
-            <li>• 18 trains may be affected</li>
-            <li>• Estimated delay: 45 minutes</li>
-            <li>• Approx. 4200 passengers impacted</li>
+            <li>
+              • Affected Trains: {analysisData.affectedTrains}
+            </li>
+
+            <li>
+              • Affected Passengers: {analysisData.affectedPassengers}
+            </li>
           </ul>
 
         </div>
 
-        <button
-          onClick={() => navigate("/agents")}
-          className="mt-8 bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-semibold"
-        >
-          Generate Agent Response
-        </button>
+        <div className="mt-6 bg-slate-900 border border-slate-700 rounded-2xl p-6">
+
+          <h2 className="text-2xl font-semibold mb-4">
+            Recommended Action
+          </h2>
+
+          <p className="text-slate-300">
+            {analysisData.recommendedAction}
+          </p>
+
+        </div>
+<button
+  onClick={handleGenerateAgents}
+  disabled={loading}
+  className="mt-8 bg-cyan-500 hover:bg-cyan-600 px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {loading ? (
+    <div className="flex items-center gap-2">
+      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+      <span>Generating AI Response...</span>
+    </div>
+  ) : (
+    "Generate Agent Response"
+  )}
+</button>
 
       </div>
 
